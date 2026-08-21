@@ -122,7 +122,6 @@ function closeMobileMenu() {
                   <NumberFlow class="tabular-nums" :value="rawStats.stars" />
                 </a>
               </Button>
-              <SwitchLanguage />
               <SwitchTheme />
             </div>
 
@@ -217,7 +216,6 @@ function closeMobileMenu() {
                       </a>
                     </Button>
                     <div class="flex items-center justify-center gap-3">
-                      <SwitchLanguage />
                       <SwitchTheme />
                     </div>
                   </div>

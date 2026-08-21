@@ -2,7 +2,7 @@ export default defineAppConfig({
   title: 'Buxtons Links',
   documentation: 'https://docs.sink.cool',
   github: 'https://github.com/miantiao-me/sink',
-  coffee: 'https://sink.cool/coffee',
+  coffee: '',
   twitter: '',
   telegram: '',
   description: 'The Buxtons link shortener, with analytics.',
