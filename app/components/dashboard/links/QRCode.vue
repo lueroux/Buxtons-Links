@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Download } from '@lucide/vue'
+import { ChevronDown, Download } from '@lucide/vue'
 import QRCodeStyling from 'qr-code-styling'
 
 const props = withDefaults(defineProps<{
@@ -8,6 +8,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   image: '',
 })
+
+const downloadFormats = ['png', 'jpeg', 'svg'] as const
 
 const color = ref('#000000')
 const showLogo = ref(true)
@@ -21,49 +23,50 @@ const presets = [
 
 const isPreset = computed(() => presets.some(preset => preset.value === color.value))
 
-const options = {
-  width: 256,
-  height: 256,
-  data: props.data,
-  type: 'svg' as const,
-  margin: 10,
-  qrOptions: { typeNumber: 0 as const, mode: 'Byte' as const, errorCorrectionLevel: 'Q' as const },
-  imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 2 },
-  dotsOptions: { type: 'dots' as const, color: color.value },
-  backgroundOptions: { color: '#ffffff' },
-  image: props.image,
-  cornersSquareOptions: { type: 'extra-rounded' as const, color: color.value },
-  cornersDotOptions: { type: 'dot' as const, color: color.value },
-}
-
-const qrCode = new QRCodeStyling(options)
+const qrCode = shallowRef<QRCodeStyling | null>(null)
 const qrCodeEl = useTemplateRef<HTMLElement>('qrCodeEl')
 
-function updateQR() {
-  qrCode.update({
+function buildQR() {
+  const options = {
+    width: 256,
+    height: 256,
+    data: props.data,
+    type: 'svg' as const,
+    margin: 10,
+    qrOptions: { typeNumber: 0 as const, mode: 'Byte' as const, errorCorrectionLevel: 'Q' as const },
     dotsOptions: { type: 'dots' as const, color: color.value },
+    backgroundOptions: { color: '#ffffff' },
     cornersSquareOptions: { type: 'extra-rounded' as const, color: color.value },
     cornersDotOptions: { type: 'dot' as const, color: color.value },
-    image: showLogo.value ? props.image : '',
-  })
+    ...(showLogo.value && props.image
+      ? {
+          image: props.image,
+          imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 2 },
+        }
+      : {}),
+  }
+
+  qrCode.value = new QRCodeStyling(options)
+
+  if (qrCodeEl.value) {
+    qrCodeEl.value.innerHTML = ''
+    qrCode.value.append(qrCodeEl.value as unknown as HTMLElement)
+  }
 }
 
-watch(color, updateQR)
-watch(showLogo, updateQR)
+watch(color, buildQR)
+watch(showLogo, buildQR)
+watch(() => props.image, buildQR)
 
-function downloadQRCode() {
+function downloadQRCode(extension: typeof downloadFormats[number]) {
   const slug = props.data.split('/').pop()
-  qrCode.download({
-    extension: 'png',
+  qrCode.value?.download({
+    extension,
     name: `qr_${slug}`,
   })
 }
 
-onMounted(() => {
-  if (qrCodeEl.value) {
-    qrCode.append(qrCodeEl.value as unknown as HTMLElement)
-  }
-})
+onMounted(buildQR)
 </script>
 
 <template>
@@ -122,18 +125,31 @@ onMounted(() => {
         {{ $t('links.qr.show_logo') }}
       </Label>
 
-      <Button
-        variant="outline"
-        size="sm"
-        class="
-          min-h-11
-          lg:min-h-8
-        "
-        @click="downloadQRCode"
-      >
-        <Download aria-hidden="true" class="mr-2 size-4" />
-        {{ $t('links.download_qr_code') }}
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <Button
+            variant="outline"
+            size="sm"
+            class="
+              min-h-11
+              lg:min-h-8
+            "
+          >
+            <Download aria-hidden="true" class="mr-2 size-4" />
+            {{ $t('links.download_qr_code') }}
+            <ChevronDown aria-hidden="true" class="ml-2 size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            v-for="format in downloadFormats"
+            :key="format"
+            @click="downloadQRCode(format)"
+          >
+            {{ format.toUpperCase() }}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   </div>
 </template>
