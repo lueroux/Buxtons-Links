@@ -6,9 +6,6 @@
           {{ $t('login.title') }}
         </h1>
       </CardTitle>
-      <CardDescription>
-        {{ $t('login.description') }}
-      </CardDescription>
     </CardHeader>
     <CardContent class="grid gap-4">
       <LoginForm />
