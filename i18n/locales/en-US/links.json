@@ -94,7 +94,7 @@
       "og_image": "Image",
       "geo_routing": "Geo Redirect",
       "add_geo_route": "Add Geo Redirect",
-      "country_code": "Country Code (e.g. US)",
+      "country_code": "Country Code (e.g. UK)",
       "select_country": "Select country",
       "search_country": "Search country…",
       "no_country_found": "No country found.",
@@ -122,7 +122,7 @@
       "utm_apply": "Apply",
       "utm_clear": "Clear",
       "utm_invalid_url": "Enter a valid URL to preview and apply UTM parameters.",
-      "ai_og_generate": "Generate AI OpenGraph",
+      "ai_og_generate": "Generate Auto OpenGraph",
       "duplicate_url_hint": "This URL already exists as {shortLink}"
     },
     "dialogs": {

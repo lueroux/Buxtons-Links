@@ -2,9 +2,13 @@
 import type { NuxtError } from '#app'
 import errorImage from './assets/images/404.svg?raw'
 
-defineProps<{
+const props = defineProps<{
   error: NuxtError
 }>()
+
+if (props.error.statusCode === 404) {
+  await navigateTo('https://buxtons.net', { external: true, replace: true })
+}
 </script>
 
 <template>
