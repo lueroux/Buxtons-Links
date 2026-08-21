@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     linkCacheTtl: 60,
     redirectWithQuery: false,
     redirectNoStore: false,
-    homeURL: '',
+    homeURL: 'https://buxtons.net',
     cfAccountId: '',
     cfApiToken: '',
     dataset: 'sink',

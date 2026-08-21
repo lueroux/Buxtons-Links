@@ -71,9 +71,9 @@ colors:
   dark-sidebar-ring: "oklch(0.552 0.016 285.938)"
 typography:
   sans:
-    fontFamily: "IBM Plex Sans, sans-serif"
+    fontFamily: "Montserrat Variable, Montserrat, sans-serif"
   heading:
-    fontFamily: "IBM Plex Sans, sans-serif"
+    fontFamily: "Montserrat Variable, Montserrat, sans-serif"
 rounded:
   base: 0.625rem
   lg: 0.625rem
@@ -105,7 +105,7 @@ The unprefixed tokens reproduce the semantic roles in `:root`; `dark-*` tokens f
 
 ## Typography
 
-Use IBM Plex Sans for interface text. `heading` is an alias of the same family, not a separate display face. Components choose font size, weight, and line height with local utilities; this file does not define a global type scale.
+Use Montserrat for interface text; it is self-hosted through `@fontsource-variable/montserrat` and exposes the full 100–900 weight axis. `heading` is an alias of the same family, not a separate display face. Components choose font size, weight, and line height with local utilities; this file does not define a global type scale.
 
 ## Layout
 

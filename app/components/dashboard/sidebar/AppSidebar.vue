@@ -62,7 +62,7 @@ const settingsItems = computed<NavItem[]>(() => [
                 "
               >
                 <img
-                  src="/sink.png"
+                  src="/buxtons-links.png"
                   alt=""
                   width="32"
                   height="32"
