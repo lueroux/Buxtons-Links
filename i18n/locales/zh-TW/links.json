@@ -30,7 +30,13 @@
     "download_qr_code": "下載 QR code",
     "change_qr_color": "更改 QR code 顏色",
     "qr": {
-      "text_alternative": "{url} 的 QR Code"
+      "text_alternative": "{url} 的 QR Code",
+      "show_logo": "Show logo",
+      "color_black": "Black",
+      "color_dark": "Dark",
+      "color_green": "Green",
+      "color_white": "White",
+      "color_custom": "Custom"
     },
     "expired": "已過期",
     "unsafe": "不安全連結",

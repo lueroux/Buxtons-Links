@@ -8,7 +8,19 @@ const props = withDefaults(defineProps<{
 }>(), {
   image: '',
 })
+
 const color = ref('#000000')
+const showLogo = ref(true)
+
+const presets = [
+  { key: 'black', value: '#000000' },
+  { key: 'dark', value: '#252525' },
+  { key: 'green', value: '#94be57' },
+  { key: 'white', value: '#ffffff' },
+]
+
+const isPreset = computed(() => presets.some(preset => preset.value === color.value))
+
 const options = {
   width: 256,
   height: 256,
@@ -17,27 +29,27 @@ const options = {
   margin: 10,
   qrOptions: { typeNumber: 0 as const, mode: 'Byte' as const, errorCorrectionLevel: 'Q' as const },
   imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 2 },
-  dotsOptions: { type: 'dots' as const, color: '#000000' },
+  dotsOptions: { type: 'dots' as const, color: color.value },
   backgroundOptions: { color: '#ffffff' },
   image: props.image,
-  cornersSquareOptions: { type: 'extra-rounded' as const, color: '#000000' },
-  cornersDotOptions: { type: 'dot' as const, color: '#000000' },
+  cornersSquareOptions: { type: 'extra-rounded' as const, color: color.value },
+  cornersDotOptions: { type: 'dot' as const, color: color.value },
 }
 
 const qrCode = new QRCodeStyling(options)
 const qrCodeEl = useTemplateRef<HTMLElement>('qrCodeEl')
 
-function updateColor(newColor: string) {
+function updateQR() {
   qrCode.update({
-    dotsOptions: { type: 'dots' as const, color: newColor },
-    cornersSquareOptions: { type: 'extra-rounded' as const, color: newColor },
-    cornersDotOptions: { type: 'dot' as const, color: newColor },
+    dotsOptions: { type: 'dots' as const, color: color.value },
+    cornersSquareOptions: { type: 'extra-rounded' as const, color: color.value },
+    cornersDotOptions: { type: 'dot' as const, color: color.value },
+    image: showLogo.value ? props.image : '',
   })
 }
 
-watch(color, (newColor) => {
-  updateColor(newColor)
-})
+watch(color, updateQR)
+watch(showLogo, updateQR)
 
 function downloadQRCode() {
   const slug = props.data.split('/').pop()
@@ -63,27 +75,53 @@ onMounted(() => {
       :aria-label="$t('links.qr.text_alternative', { url: data })"
       class="rounded-lg border border-border bg-white p-1 shadow-sm"
     />
-    <div class="flex items-center gap-4">
-      <div class="relative flex items-center">
+    <div class="flex w-full flex-wrap items-center justify-center gap-3">
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <button
+          v-for="preset in presets"
+          :key="preset.key"
+          type="button"
+          class="
+            size-9 rounded-full border border-input ring-offset-background
+            transition-shadow
+            focus-visible:ring-2 focus-visible:ring-ring
+            focus-visible:ring-offset-2 focus-visible:outline-none
+          "
+          :class="{ 'ring-2 ring-ring ring-offset-2': color === preset.value, 'border-border/50': preset.value === '#ffffff' }"
+          :style="{ backgroundColor: preset.value }"
+          :title="$t(`links.qr.color_${preset.key}`)"
+          :aria-label="$t(`links.qr.color_${preset.key}`)"
+          @click="color = preset.value"
+        />
+
         <label
           class="
-            relative size-11 cursor-pointer overflow-hidden rounded-full border
+            relative size-9 cursor-pointer overflow-hidden rounded-full border
             border-input ring-offset-background
-            focus-within:ring-3 focus-within:ring-ring/50
-            lg:size-9
+            focus-within:ring-2 focus-within:ring-ring
+            focus-within:ring-offset-2 focus-within:outline-none
           "
-          :style="{ backgroundColor: color }"
-          :title="$t('links.change_qr_color')"
+          :class="{ 'ring-2 ring-ring ring-offset-2': !isPreset }"
+          :title="$t('links.qr.color_custom')"
         >
           <input
             v-model="color"
             type="color"
             class="absolute inset-0 size-full cursor-pointer opacity-0"
-            :aria-label="$t('links.change_qr_color')"
-            :title="$t('links.change_qr_color')"
+            :aria-label="$t('links.qr.color_custom')"
           >
+          <span
+            class="pointer-events-none absolute inset-0"
+            :style="{ backgroundColor: color }"
+          />
         </label>
       </div>
+
+      <Label class="inline-flex cursor-pointer items-center gap-2 text-sm">
+        <Switch v-model:checked="showLogo" :aria-label="$t('links.qr.show_logo')" />
+        {{ $t('links.qr.show_logo') }}
+      </Label>
+
       <Button
         variant="outline"
         size="sm"

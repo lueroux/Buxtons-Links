@@ -30,7 +30,13 @@
     "download_qr_code": "下载二维码",
     "change_qr_color": "更改二维码颜色",
     "qr": {
-      "text_alternative": "{url} 的二维码"
+      "text_alternative": "{url} 的二维码",
+      "show_logo": "Show logo",
+      "color_black": "Black",
+      "color_dark": "Dark",
+      "color_green": "Green",
+      "color_white": "White",
+      "color_custom": "Custom"
     },
     "expired": "已过期",
     "unsafe": "不安全链接",

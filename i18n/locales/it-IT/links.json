@@ -30,7 +30,13 @@
     "download_qr_code": "Scarica Codice QR",
     "change_qr_color": "Cambia colore del codice QR",
     "qr": {
-      "text_alternative": "Codice QR per {url}"
+      "text_alternative": "Codice QR per {url}",
+      "show_logo": "Show logo",
+      "color_black": "Black",
+      "color_dark": "Dark",
+      "color_green": "Green",
+      "color_white": "White",
+      "color_custom": "Custom"
     },
     "expired": "Scaduto",
     "unsafe": "Link non sicuro",

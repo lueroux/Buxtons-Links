@@ -30,7 +30,13 @@
     "download_qr_code": "Unduh Kode QR",
     "change_qr_color": "Ubah warna QR",
     "qr": {
-      "text_alternative": "Kode QR untuk {url}"
+      "text_alternative": "Kode QR untuk {url}",
+      "show_logo": "Show logo",
+      "color_black": "Black",
+      "color_dark": "Dark",
+      "color_green": "Green",
+      "color_white": "White",
+      "color_custom": "Custom"
     },
     "expired": "Kedaluwarsa",
     "unsafe": "Tautan tidak aman",
