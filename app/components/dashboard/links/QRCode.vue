@@ -38,12 +38,10 @@ function buildQR() {
     backgroundOptions: { color: '#ffffff' },
     cornersSquareOptions: { type: 'extra-rounded' as const, color: color.value },
     cornersDotOptions: { type: 'dot' as const, color: color.value },
-    ...(showLogo.value && props.image
-      ? {
-          image: props.image,
-          imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 2 },
-        }
-      : {}),
+    image: showLogo.value && props.image ? props.image : '',
+    imageOptions: showLogo.value && props.image
+      ? { hideBackgroundDots: true, imageSize: 0.4, margin: 2 }
+      : { hideBackgroundDots: false, imageSize: 0, margin: 0 },
   }
 
   qrCode.value = new QRCodeStyling(options)
@@ -120,10 +118,16 @@ onMounted(buildQR)
         </label>
       </div>
 
-      <Label class="inline-flex cursor-pointer items-center gap-2 text-sm">
-        <Switch v-model:checked="showLogo" :aria-label="$t('links.qr.show_logo')" />
-        {{ $t('links.qr.show_logo') }}
-      </Label>
+      <div class="inline-flex items-center gap-2 text-sm">
+        <Switch
+          id="qr-show-logo"
+          v-model="showLogo"
+          :aria-label="$t('links.qr.show_logo')"
+        />
+        <Label for="qr-show-logo" class="cursor-pointer font-medium">
+          {{ $t('links.qr.show_logo') }}
+        </Label>
+      </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
