@@ -3,12 +3,6 @@ import { ExternalLink, Menu, Star } from '@lucide/vue'
 import NumberFlow from '@number-flow/vue'
 import { GitHubIcon, TelegramIcon, XIcon } from 'vue3-simple-icons'
 import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from '@/components/ui/navigation-menu'
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -79,49 +73,6 @@ function closeMobileMenu() {
                 lg:flex
               "
             >
-              <NavigationMenu :viewport="false">
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink as-child>
-                      <a
-                        :href="documentation"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        :aria-label="$t('layouts.links.documentation_aria_label')"
-                      >
-                        {{ $t('layouts.links.documentation') }}
-                        <ExternalLink class="size-3.5" aria-hidden="true" />
-                      </a>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink as-child>
-                      <a
-                        href="/_docs/scalar"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {{ $t('layouts.links.api_reference') }}
-                      </a>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-
-              <Button as-child variant="outline">
-                <a
-                  :href="github"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  :title="$t('layouts.footer.social.github')"
-                  :aria-label="$t('layouts.links.github_aria_label')"
-                  class="flex items-center gap-1.5"
-                >
-                  <GitHubIcon class="size-4" aria-hidden="true" />
-                  <Star class="size-3" aria-hidden="true" />
-                  <NumberFlow class="tabular-nums" :value="rawStats.stars" />
-                </a>
-              </Button>
               <SwitchTheme />
             </div>
 

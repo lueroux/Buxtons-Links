@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { documentation } = useAppConfig()
 </script>
 
 <template>
@@ -29,20 +28,6 @@ const { documentation } = useAppConfig()
           </p>
 
           <div class="mt-8 flex flex-wrap justify-center gap-4">
-            <Button
-              as-child
-              size="lg"
-            >
-              <a
-                :href="`${documentation}/guide/getting-started`"
-                target="_blank"
-                rel="noopener noreferrer"
-                :title="$t('home.cta.button')"
-              >
-                {{ $t('home.cta.button') }}
-              </a>
-            </Button>
-
             <Button
               as-child
               size="lg"

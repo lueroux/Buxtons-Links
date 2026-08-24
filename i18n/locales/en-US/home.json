@@ -23,7 +23,7 @@
         "description": "Create custom slugs and add UTM parameters"
       },
       "ai_slug": {
-        "title": "AI Assistance",
+        "title": "Auto Assistance",
         "description": "Generate slugs and OpenGraph metadata from page content"
       },
       "link_expiration": {
@@ -56,25 +56,25 @@
       }
     },
     "cta": {
-      "title": "Deploy Buxtons Links",
-      "description": "Follow the getting started guide to configure and deploy Buxtons Links on Cloudflare",
-      "button": "Read Deployment Guide"
+      "title": "Buxtons Links",
+      "description": "Login to the dashboard to manage links",
+      "button": "Dashboard"
     },
     "logos": {
       "title": "Built with awesome technologies"
     },
     "twitter": {
-      "follow": "Follow on X(Twitter)"
+      "follow": "Follow"
     },
     "stats": {
       "title": "Buxtons Links in Numbers",
-      "subtitle": "Trusted by developers around the world",
+      "subtitle": "Trusted by us",
       "stars": "Stars on GitHub",
       "forks": "Forks"
     },
     "testimonials": {
-      "title": "Loved by Users",
-      "subtitle": "See what developers are saying about Buxtons Links"
+      "title": "Loved by us",
+      "subtitle": "See what we're saying about Buxtons Links"
     }
   }
 }
