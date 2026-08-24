@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useMediaQuery } from '@vueuse/core'
 import { parseQuery, parseURL, withQuery } from 'ufo'
 import { toast } from 'vue-sonner'
 import { UrlSchema } from '#shared/schemas/link'
@@ -23,8 +22,64 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const isDesktop = useMediaQuery('(min-width: 640px)')
 const utmValues = reactive<UtmFormValues>(createEmptyUtmValues())
+
+const sourceOptions = [
+  { label: 'Google', value: 'google' },
+  { label: 'Facebook', value: 'facebook' },
+  { label: 'Instagram', value: 'instagram' },
+  { label: 'X / Twitter', value: 'twitter' },
+  { label: 'LinkedIn', value: 'linkedin' },
+  { label: 'YouTube', value: 'youtube' },
+  { label: 'Newsletter', value: 'newsletter' },
+  { label: 'Website', value: 'website' },
+]
+
+const sourceOtherValue = 'other'
+
+const mediumOptions = [
+  { label: 'Cost Per Click', value: 'cpc' },
+  { label: 'Social', value: 'social' },
+  { label: 'Email', value: 'email' },
+  { label: 'Paid Social', value: 'paid-social' },
+  { label: 'Affiliate', value: 'affiliate' },
+  { label: 'Referral', value: 'referral' },
+  { label: 'Display', value: 'display' },
+]
+
+const selectedSourcePreset = computed(() => {
+  if (!utmValues.source)
+    return ''
+  const matched = sourceOptions.find(option => option.value === utmValues.source)
+  return matched ? matched.value : sourceOtherValue
+})
+
+const isCustomSource = computed(() => selectedSourcePreset.value === sourceOtherValue)
+const customSource = ref('')
+
+function formatUtmValue(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_-]/g, '')
+}
+
+function onSourcePresetUpdate(value: string) {
+  if (value === sourceOtherValue) {
+    utmValues.source = formatUtmValue(customSource.value)
+  }
+  else {
+    utmValues.source = value
+    customSource.value = ''
+  }
+}
+
+function onCustomSourceInput(value: string) {
+  customSource.value = formatUtmValue(value)
+  if (isCustomSource.value)
+    utmValues.source = customSource.value
+}
 
 const validatedUrl = computed(() => {
   const result = UrlSchema.safeParse(props.url)
@@ -83,6 +138,7 @@ function buildUtmQuery(values: UtmFormValues) {
 
 function syncUtmValues(url: string) {
   Object.assign(utmValues, createEmptyUtmValues())
+  customSource.value = ''
 
   const result = UrlSchema.safeParse(url)
   if (!result.success)
@@ -96,10 +152,14 @@ function syncUtmValues(url: string) {
   utmValues.campaign = getQueryValue(query.utm_campaign)
   utmValues.term = getQueryValue(query.utm_term)
   utmValues.content = getQueryValue(query.utm_content)
+
+  if (utmValues.source && !sourceOptions.some(option => option.value === utmValues.source))
+    customSource.value = utmValues.source
 }
 
 function clearUtmValues() {
   Object.assign(utmValues, createEmptyUtmValues())
+  customSource.value = ''
 }
 
 function submitForm() {
@@ -131,27 +191,80 @@ function submitForm() {
             <FieldLabel :for="`${formId}-utm-source`">
               {{ $t('links.form.utm_source') }}
             </FieldLabel>
-            <Input
-              :id="`${formId}-utm-source`"
-              v-model="utmValues.source"
-              name="utm_source"
-              :autofocus="isDesktop"
-              placeholder="newsletter"
-              autocomplete="off"
-            />
+            <FieldDescription :id="`${formId}-utm-source-hint`">
+              {{ $t('links.form.utm_source_description') }}
+            </FieldDescription>
+            <Select
+              :model-value="selectedSourcePreset"
+              @update:model-value="onSourcePresetUpdate($event as string)"
+            >
+              <SelectTrigger
+                :id="`${formId}-utm-source`"
+                name="utm_source"
+                :aria-describedby="`${formId}-utm-source-hint`"
+              >
+                <SelectValue :placeholder="$t('links.form.utm_select_source')" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="option in sourceOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  <span class="block">{{ option.label }}</span>
+                  <span class="block text-xs text-muted-foreground">{{ option.value }}</span>
+                </SelectItem>
+                <SelectSeparator />
+                <SelectItem :value="sourceOtherValue">
+                  {{ $t('links.form.utm_source_other') }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div
+              v-if="isCustomSource"
+              class="mt-3"
+            >
+              <Input
+                :id="`${formId}-utm-source-custom`"
+                :model-value="customSource"
+                name="utm_source_custom"
+                :placeholder="$t('links.form.utm_source_other_placeholder')"
+                autocomplete="off"
+                @update:model-value="onCustomSourceInput($event as string)"
+              />
+            </div>
           </Field>
 
           <Field>
             <FieldLabel :for="`${formId}-utm-medium`">
               {{ $t('links.form.utm_medium') }}
             </FieldLabel>
-            <Input
-              :id="`${formId}-utm-medium`"
-              v-model="utmValues.medium"
-              name="utm_medium"
-              placeholder="email"
-              autocomplete="off"
-            />
+            <FieldDescription :id="`${formId}-utm-medium-hint`">
+              {{ $t('links.form.utm_medium_description') }}
+            </FieldDescription>
+            <Select
+              :model-value="utmValues.medium"
+              @update:model-value="utmValues.medium = formatUtmValue($event as string)"
+            >
+              <SelectTrigger
+                :id="`${formId}-utm-medium`"
+                name="utm_medium"
+                :aria-describedby="`${formId}-utm-medium-hint`"
+              >
+                <SelectValue :placeholder="$t('links.form.utm_select_medium')" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="option in mediumOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  <span class="block">{{ option.label }}</span>
+                  <span class="block text-xs text-muted-foreground">{{ option.value }}</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </Field>
         </div>
 
@@ -159,12 +272,17 @@ function submitForm() {
           <FieldLabel :for="`${formId}-utm-campaign`">
             {{ $t('links.form.utm_campaign') }}
           </FieldLabel>
+          <FieldDescription :id="`${formId}-utm-campaign-hint`">
+            {{ $t('links.form.utm_campaign_description') }}
+          </FieldDescription>
           <Input
             :id="`${formId}-utm-campaign`"
-            v-model="utmValues.campaign"
+            :model-value="utmValues.campaign"
             name="utm_campaign"
-            placeholder="spring_sale"
+            :aria-describedby="`${formId}-utm-campaign-hint`"
+            placeholder="spring_sale_2024"
             autocomplete="off"
+            @update:model-value="utmValues.campaign = formatUtmValue($event as string)"
           />
         </Field>
 
@@ -178,12 +296,17 @@ function submitForm() {
             <FieldLabel :for="`${formId}-utm-term`">
               {{ $t('links.form.utm_term') }}
             </FieldLabel>
+            <FieldDescription :id="`${formId}-utm-term-hint`">
+              {{ $t('links.form.utm_term_description') }}
+            </FieldDescription>
             <Input
               :id="`${formId}-utm-term`"
-              v-model="utmValues.term"
+              :model-value="utmValues.term"
               name="utm_term"
-              placeholder="running-shoes"
+              :aria-describedby="`${formId}-utm-term-hint`"
+              placeholder="running_shoes"
               autocomplete="off"
+              @update:model-value="utmValues.term = formatUtmValue($event as string)"
             />
           </Field>
 
@@ -191,12 +314,17 @@ function submitForm() {
             <FieldLabel :for="`${formId}-utm-content`">
               {{ $t('links.form.utm_content') }}
             </FieldLabel>
+            <FieldDescription :id="`${formId}-utm-content-hint`">
+              {{ $t('links.form.utm_content_description') }}
+            </FieldDescription>
             <Input
               :id="`${formId}-utm-content`"
-              v-model="utmValues.content"
+              :model-value="utmValues.content"
               name="utm_content"
+              :aria-describedby="`${formId}-utm-content-hint`"
               placeholder="hero_button"
               autocomplete="off"
+              @update:model-value="utmValues.content = formatUtmValue($event as string)"
             />
           </Field>
         </div>

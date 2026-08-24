@@ -235,13 +235,13 @@ defineExpose({ initializeRandomSlug })
               </FieldLabel>
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                class="px-3 text-xs"
+                class="px-3"
                 :aria-label="$t('links.form.utm_builder')"
                 @click="utmBuilderOpen = true"
               >
-                UTM
+                {{ $t('links.form.utm_builder') }}
               </Button>
             </div>
             <Input
