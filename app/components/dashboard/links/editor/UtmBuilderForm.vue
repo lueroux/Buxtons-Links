@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { parseQuery, parseURL, withQuery } from 'ufo'
-import { toast } from 'vue-sonner'
 import { UrlSchema } from '#shared/schemas/link'
 
 interface UtmFormValues {
@@ -17,11 +16,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'apply': [url: string]
-  'update:canApply': [value: boolean]
+  apply: [url: string]
 }>()
-
-const { t } = useI18n()
 const utmValues = reactive<UtmFormValues>(createEmptyUtmValues())
 
 const sourceOptions = [
@@ -101,11 +97,17 @@ const validatedPreviewUrl = computed(() => {
   return result.success ? result.data : undefined
 })
 
-const canApply = computed(() => Boolean(validatedUrl.value && validatedPreviewUrl.value))
-
-watch(canApply, value => emit('update:canApply', value), { immediate: true })
-
 syncUtmValues(props.url)
+
+watch(() => props.url, (url) => {
+  if (url !== previewUrl.value)
+    syncUtmValues(url)
+})
+
+watch(validatedPreviewUrl, (url) => {
+  if (url && url !== props.url)
+    emit('apply', url)
+})
 
 function createEmptyUtmValues(): UtmFormValues {
   return {
@@ -161,25 +163,29 @@ function clearUtmValues() {
   Object.assign(utmValues, createEmptyUtmValues())
   customSource.value = ''
 }
-
-function submitForm() {
-  if (!validatedPreviewUrl.value) {
-    toast.error(t('links.form.utm_invalid_url'))
-    return
-  }
-
-  emit('apply', validatedPreviewUrl.value)
-}
 </script>
 
 <template>
-  <form
+  <section
     :id="formId"
-    class="w-full"
-    @submit.prevent="submitForm"
-    @reset.prevent="clearUtmValues"
+    class="w-full space-y-5"
+    :aria-label="$t('links.form.utm_builder')"
   >
-    <div class="w-full space-y-5 px-1">
+    <div class="flex items-start justify-between gap-4">
+      <div class="space-y-1">
+        <h3 class="font-medium">
+          {{ $t('links.form.utm_builder') }}
+        </h3>
+        <p class="text-sm text-muted-foreground">
+          {{ $t('links.form.utm_description') }}
+        </p>
+      </div>
+      <Button type="button" variant="ghost" size="sm" @click="clearUtmValues">
+        {{ $t('links.form.utm_clear') }}
+      </Button>
+    </div>
+
+    <div class="w-full space-y-5">
       <FieldGroup>
         <div
           class="
@@ -345,5 +351,5 @@ function submitForm() {
         </Field>
       </FieldGroup>
     </div>
-  </form>
+  </section>
 </template>

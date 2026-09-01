@@ -58,6 +58,9 @@
     },
     "form": {
       "url": "URL",
+      "title": "Title",
+      "title_description": "A recognizable name for this link. If left blank, a title is created from the UTM values.",
+      "title_placeholder": "Spring campaign on Google",
       "slug": "슬러그",
       "comment": "설명",
       "tags": "태그",

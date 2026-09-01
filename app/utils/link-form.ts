@@ -22,6 +22,21 @@ export function createLinkFormInitialValues(link: Partial<DashboardLink>): Dashb
   }
 }
 
+export function createUtmLinkTitle(url: string): string | undefined {
+  try {
+    const query = new URL(url).searchParams
+    const values = ['utm_campaign', 'utm_source', 'utm_medium', 'utm_content', 'utm_term']
+      .map(key => query.get(key)?.trim())
+      .filter((value): value is string => Boolean(value))
+      .map(value => value.replace(/[_-]+/g, ' ').replace(/\b\w/g, character => character.toUpperCase()))
+
+    return values.length ? values.join(' · ').slice(0, 256) : undefined
+  }
+  catch {
+    return undefined
+  }
+}
+
 export function normalizeLinkFormSubmitPayload(value: DashboardLinkFormData, isEdit: boolean) {
   const geo: Record<string, string> = {}
   value.geo?.forEach((route) => {
@@ -43,7 +58,7 @@ export function normalizeLinkFormSubmitPayload(value: DashboardLinkFormData, isE
     expiration: value.expiration ? date2unix(value.expiration, 'end') : undefined,
     google: value.google || undefined,
     apple: value.apple || undefined,
-    title: value.title || undefined,
+    title: value.title.trim() || createUtmLinkTitle(value.url),
     description: value.description || undefined,
     image: value.image || undefined,
     cloaking: value.cloaking,

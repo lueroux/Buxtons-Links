@@ -58,6 +58,9 @@
     },
     "form": {
       "url": "連結地址",
+      "title": "標題",
+      "title_description": "用來識別此連結的名稱。如果留空，將根據 UTM 參數自動建立標題。",
+      "title_placeholder": "Google 春季推廣活動",
       "slug": "短連結",
       "comment": "備註",
       "tags": "標籤",

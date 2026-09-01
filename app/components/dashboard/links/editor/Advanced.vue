@@ -203,38 +203,22 @@ async function aiOg() {
       </AccordionTrigger>
       <AccordionContent class="px-1">
         <FieldGroup>
-          <props.form.Field v-slot="{ field }" name="title">
-            <Field>
-              <div class="flex items-center justify-between">
-                <FieldLabel :for="`${idPrefix}-${field.name}`">
-                  {{ $t('links.form.og_title') }}
-                </FieldLabel>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  :aria-label="$t('links.form.ai_og_generate')"
-                  :disabled="aiOgPending"
-                  @click="aiOg"
-                >
-                  <Sparkles
-                    aria-hidden="true"
-                    class="size-4"
-                    :class="{ 'motion-safe:animate-bounce': aiOgPending }"
-                  />
-                </Button>
-              </div>
-              <Input
-                :id="`${idPrefix}-${field.name}`"
-                :name="field.name"
-                :model-value="field.state.value"
-                :placeholder="$t('links.form.og_title_placeholder')"
-                autocomplete="off"
-                @blur="field.handleBlur"
-                @input="field.handleChange(($event.target as HTMLInputElement).value)"
+          <div class="flex justify-end">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              :disabled="aiOgPending"
+              @click="aiOg"
+            >
+              <Sparkles
+                aria-hidden="true"
+                class="size-4"
+                :class="{ 'motion-safe:animate-bounce': aiOgPending }"
               />
-            </Field>
-          </props.form.Field>
+              {{ $t('links.form.ai_og_generate') }}
+            </Button>
+          </div>
 
           <props.form.Field v-slot="{ field }" name="description">
             <DashboardLinksEditorFieldTextarea

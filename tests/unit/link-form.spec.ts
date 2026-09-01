@@ -2,6 +2,7 @@ import { CalendarDate } from '@internationalized/date'
 import { describe, expect, it, vi } from 'vitest'
 import {
   createLinkFormInitialValues,
+  createUtmLinkTitle,
   normalizeLinkFormSubmitPayload,
 } from '../../app/utils/link-form'
 import { LINK_PASSWORD_MASK_PREFIX } from '../../shared/utils/link-password'
@@ -54,6 +55,21 @@ describe('link form submit payload', () => {
       ...overrides,
     }
   }
+
+  it('creates a title from UTM values when the title is blank', () => {
+    const url = 'https://example.com/offer?utm_source=google&utm_medium=paid-social&utm_campaign=spring_sale'
+
+    expect(createUtmLinkTitle(url)).toBe('Spring Sale · Google · Paid Social')
+    expect(normalizeLinkFormSubmitPayload(formValues({ url, title: '  ' }), false).title)
+      .toBe('Spring Sale · Google · Paid Social')
+  })
+
+  it('preserves a custom title instead of replacing it with UTM values', () => {
+    const url = 'https://example.com/?utm_campaign=spring_sale'
+
+    expect(normalizeLinkFormSubmitPayload(formValues({ url, title: 'Custom title' }), false).title)
+      .toBe('Custom title')
+  })
 
   it('preserves an edited masked password by submitting undefined', () => {
     const payload = normalizeLinkFormSubmitPayload(formValues({

@@ -58,6 +58,9 @@
     },
     "form": {
       "url": "链接地址",
+      "title": "标题",
+      "title_description": "用于识别此链接的名称。如果留空，将根据 UTM 参数自动创建标题。",
+      "title_placeholder": "Google 春季推广活动",
       "slug": "短链",
       "comment": "备注",
       "tags": "标签",

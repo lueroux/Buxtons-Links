@@ -67,7 +67,6 @@ const validateSlug = makeZodValidator(slugValidator)
 const validateComment = makeZodValidator(commentValidator)
 const validateOptionalUrl = makeZodValidator(optionalUrlValidator)
 
-const utmBuilderOpen = ref(false)
 const advancedSections = ref<string[]>([])
 
 function formatErrors(errors: unknown[]): string[] {
@@ -164,7 +163,7 @@ async function applyUtmUrl(url: string) {
 
 function getInitialAdvancedSections() {
   const sections: string[] = []
-  if (props.link.title || props.link.description || props.link.image)
+  if (props.link.description || props.link.image)
     sections.push('og')
   if (props.link.google || props.link.apple)
     sections.push('device')
@@ -229,21 +228,9 @@ defineExpose({ initializeRandomSlug })
           :validators="{ onBlur: validateUrl, onSubmit: validateUrl }"
         >
           <Field :data-invalid="isInvalid(field)">
-            <div class="flex items-center justify-between">
-              <FieldLabel :for="`${formId}-${field.name}`">
-                {{ $t('links.form.url') }}
-              </FieldLabel>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                class="px-3"
-                :aria-label="$t('links.form.utm_builder')"
-                @click="utmBuilderOpen = true"
-              >
-                {{ $t('links.form.utm_builder') }}
-              </Button>
-            </div>
+            <FieldLabel :for="`${formId}-${field.name}`">
+              {{ $t('links.form.url') }}
+            </FieldLabel>
             <Input
               :id="`${formId}-${field.name}`"
               :name="field.name"
@@ -276,6 +263,32 @@ defineExpose({ initializeRandomSlug })
             <FieldError
               v-if="isInvalid(field)"
               :errors="formatErrors(field.state.meta.errors)"
+            />
+          </Field>
+        </form.Field>
+
+        <DashboardLinksEditorUtmBuilderForm
+          :form-id="`${formId}-utm-builder`"
+          :url="currentUrl"
+          @apply="applyUtmUrl"
+        />
+
+        <form.Field v-slot="{ field }" name="title">
+          <Field>
+            <FieldLabel :for="`${formId}-${field.name}`">
+              {{ $t('links.form.title') }}
+            </FieldLabel>
+            <FieldDescription>
+              {{ $t('links.form.title_description') }}
+            </FieldDescription>
+            <Input
+              :id="`${formId}-${field.name}`"
+              :name="field.name"
+              :model-value="field.state.value"
+              :placeholder="$t('links.form.title_placeholder')"
+              autocomplete="off"
+              @blur="field.handleBlur"
+              @input="field.handleChange(($event.target as HTMLInputElement).value)"
             />
           </Field>
         </form.Field>
@@ -372,11 +385,4 @@ defineExpose({ initializeRandomSlug })
       />
     </fieldset>
   </form>
-
-  <DashboardLinksEditorUtmBuilderModal
-    v-model:open="utmBuilderOpen"
-    :id-prefix="formId"
-    :url="currentUrl"
-    @apply="applyUtmUrl"
-  />
 </template>
