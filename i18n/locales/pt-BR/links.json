@@ -46,6 +46,10 @@
       "active": "Ativos",
       "expired": "Expirados",
       "tag_label": "Tag",
+      "utm_source_label": "UTM Source",
+      "all_utm_sources": "All UTM sources",
+      "utm_medium_label": "UTM Medium",
+      "all_utm_mediums": "All UTM mediums",
       "all_tags": "Todas as tags",
       "tags_loading": "Carregando tags…",
       "tags_failed": "Falha ao carregar as tags."

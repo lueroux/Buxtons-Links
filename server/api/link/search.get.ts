@@ -51,6 +51,8 @@ const SearchQuerySchema = z.object({
   url: z.string().trim().url().max(2048).optional(),
   limit: z.coerce.number().int().min(1).max(1000).optional(),
   tag: z.string().trim().toLowerCase().min(1).max(32).optional(),
+  utmSource: z.string().trim().toLowerCase().regex(/^[a-z0-9_-]{1,64}$/).optional(),
+  utmMedium: z.string().trim().toLowerCase().regex(/^[a-z0-9_-]{1,64}$/).optional(),
   status: z.enum(['active', 'expired', 'all']).default('active'),
 })
 

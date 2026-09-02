@@ -222,6 +222,26 @@ defineExpose({ initializeRandomSlug })
 
     <fieldset :disabled="isSubmitting" class="space-y-6">
       <FieldGroup>
+        <form.Field v-slot="{ field }" name="title">
+          <Field>
+            <FieldLabel :for="`${formId}-${field.name}`">
+              {{ $t('links.form.title') }}
+            </FieldLabel>
+            <FieldDescription>
+              {{ $t('links.form.title_description') }}
+            </FieldDescription>
+            <Input
+              :id="`${formId}-${field.name}`"
+              :name="field.name"
+              :model-value="field.state.value"
+              :placeholder="$t('links.form.title_placeholder')"
+              autocomplete="off"
+              @blur="field.handleBlur"
+              @input="field.handleChange(($event.target as HTMLInputElement).value)"
+            />
+          </Field>
+        </form.Field>
+
         <form.Field
           v-slot="{ field }"
           name="url"
@@ -272,26 +292,6 @@ defineExpose({ initializeRandomSlug })
           :url="currentUrl"
           @apply="applyUtmUrl"
         />
-
-        <form.Field v-slot="{ field }" name="title">
-          <Field>
-            <FieldLabel :for="`${formId}-${field.name}`">
-              {{ $t('links.form.title') }}
-            </FieldLabel>
-            <FieldDescription>
-              {{ $t('links.form.title_description') }}
-            </FieldDescription>
-            <Input
-              :id="`${formId}-${field.name}`"
-              :name="field.name"
-              :model-value="field.state.value"
-              :placeholder="$t('links.form.title_placeholder')"
-              autocomplete="off"
-              @blur="field.handleBlur"
-              @input="field.handleChange(($event.target as HTMLInputElement).value)"
-            />
-          </Field>
-        </form.Field>
 
         <form.Field
           v-slot="{ field }"

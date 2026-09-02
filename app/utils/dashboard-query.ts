@@ -52,6 +52,8 @@ export interface LinksQueryState {
   status: DashboardLinkStatusQuery
   sort: DashboardLinkSort
   tag?: string
+  utmSource?: string
+  utmMedium?: string
 }
 
 export interface DashboardSlugFilters {
@@ -176,10 +178,16 @@ export function serializeRealtimeQuery(state: RealtimeQueryState): DashboardQuer
 
 export function parseLinksQuery(query: DashboardQuery): LinksQueryState {
   const tag = firstQueryValue(query.tag)?.trim().toLowerCase()
+  const normalizeUtmFilter = (value: DashboardQueryValue) => {
+    const normalized = firstQueryValue(value)?.trim().toLowerCase()
+    return normalized && /^[a-z0-9_-]{1,64}$/.test(normalized) ? normalized : undefined
+  }
   return {
     status: enumValue(query.status, LINK_STATUSES) ?? DEFAULT_LINK_STATUS,
     sort: enumValue(query.sort, LINK_SORTS) ?? DEFAULT_LINK_SORT,
     tag: tag && tag.length <= 32 ? tag : undefined,
+    utmSource: normalizeUtmFilter(query.utm_source),
+    utmMedium: normalizeUtmFilter(query.utm_medium),
   }
 }
 
@@ -191,6 +199,10 @@ export function serializeLinksQuery(state: LinksQueryState): DashboardQueryOutpu
     query.sort = state.sort
   if (state.tag)
     query.tag = state.tag
+  if (state.utmSource)
+    query.utm_source = state.utmSource
+  if (state.utmMedium)
+    query.utm_medium = state.utmMedium
   return query
 }
 

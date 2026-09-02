@@ -46,6 +46,10 @@
       "active": "有效",
       "expired": "已过期",
       "tag_label": "标签",
+      "utm_source_label": "UTM 来源",
+      "all_utm_sources": "所有 UTM 来源",
+      "utm_medium_label": "UTM 媒介",
+      "all_utm_mediums": "所有 UTM 媒介",
       "all_tags": "全部标签",
       "tags_loading": "正在加载标签…",
       "tags_failed": "标签加载失败。"

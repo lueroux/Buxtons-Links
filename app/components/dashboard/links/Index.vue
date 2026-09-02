@@ -41,6 +41,8 @@ async function getLinks() {
         sort: linksStore.sortBy,
         status: linksStore.status,
         tag: linksStore.tag,
+        utmSource: linksStore.utmSource,
+        utmMedium: linksStore.utmMedium,
       },
     })
 
@@ -93,14 +95,17 @@ useInfiniteScroll(
 )
 
 watch(
-  [() => linksStore.sortBy, () => linksStore.status, () => linksStore.tag],
+  [() => linksStore.sortBy, () => linksStore.status, () => linksStore.tag, () => linksStore.utmSource, () => linksStore.utmMedium],
   resetAndLoad,
 )
 
 function matchesCurrentFilters(link: DashboardLink) {
   const isExpired = Boolean(link.expiration && link.expiration <= Math.floor(Date.now() / 1000))
+  const query = new URL(link.url).searchParams
   return (linksStore.status === 'expired') === isExpired
     && (!linksStore.tag || link.tags?.includes(linksStore.tag))
+    && (!linksStore.utmSource || query.get('utm_source')?.toLowerCase() === linksStore.utmSource)
+    && (!linksStore.utmMedium || query.get('utm_medium')?.toLowerCase() === linksStore.utmMedium)
 }
 
 function updateLinkList(link: DashboardLink, type: LinkUpdateType) {

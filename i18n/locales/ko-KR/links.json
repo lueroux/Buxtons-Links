@@ -46,6 +46,10 @@
       "active": "활성",
       "expired": "만료됨",
       "tag_label": "태그",
+      "utm_source_label": "UTM Source",
+      "all_utm_sources": "All UTM sources",
+      "utm_medium_label": "UTM Medium",
+      "all_utm_mediums": "All UTM mediums",
       "all_tags": "모든 태그",
       "tags_loading": "태그 불러오는 중…",
       "tags_failed": "태그를 불러오지 못했습니다."

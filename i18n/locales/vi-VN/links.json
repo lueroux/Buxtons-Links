@@ -46,6 +46,10 @@
       "active": "Còn hiệu lực",
       "expired": "Đã hết hạn",
       "tag_label": "Thẻ",
+      "utm_source_label": "UTM Source",
+      "all_utm_sources": "All UTM sources",
+      "utm_medium_label": "UTM Medium",
+      "all_utm_mediums": "All UTM mediums",
       "all_tags": "Tất cả thẻ",
       "tags_loading": "Đang tải thẻ…",
       "tags_failed": "Không thể tải thẻ."

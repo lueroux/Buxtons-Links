@@ -221,7 +221,7 @@ watch([searchTerm, () => linksStore.status, () => linksStore.tag], ([query]) => 
             <div class="min-w-0 flex-1 space-y-1 text-left">
               <div class="flex min-w-0 items-baseline gap-2">
                 <div class="min-w-0 flex-1 truncate text-sm font-medium">
-                  {{ link.slug }}
+                  {{ link.title || link.slug }}
                 </div>
                 <div
                   v-if="link.comment"

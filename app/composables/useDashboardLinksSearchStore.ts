@@ -58,6 +58,8 @@ export const useDashboardLinksSearchStore = defineStore('dashboard-links-search'
           limit: 20,
           status: linksStore.status,
           ...(linksStore.tag ? { tag: linksStore.tag } : {}),
+          ...(linksStore.utmSource ? { utmSource: linksStore.utmSource } : {}),
+          ...(linksStore.utmMedium ? { utmMedium: linksStore.utmMedium } : {}),
         },
       })
       if (generation === searchGeneration) {
@@ -87,15 +89,19 @@ export const useDashboardLinksSearchStore = defineStore('dashboard-links-search'
       slug: link.slug,
       url: withoutUrlQuery(link.url) ?? link.url,
       comment: link.comment,
+      title: link.title,
       expiration: link.expiration,
       tags: link.tags,
     }
     const normalizedQuery = query.value.toLocaleLowerCase()
+    const urlQuery = new URL(link.url).searchParams
     const isExpired = Boolean(nextLink.expiration && nextLink.expiration <= Math.floor(Date.now() / 1000))
     const matchesCurrentFilters = (linksStore.status === 'expired') === isExpired
       && (!linksStore.tag || nextLink.tags?.includes(linksStore.tag))
+      && (!linksStore.utmSource || urlQuery.get('utm_source')?.toLowerCase() === linksStore.utmSource)
+      && (!linksStore.utmMedium || urlQuery.get('utm_medium')?.toLowerCase() === linksStore.utmMedium)
     const matchesCurrentQuery = matchesCurrentFilters && normalizedQuery
-      && [nextLink.slug, nextLink.url, nextLink.comment, ...(nextLink.tags ?? [])]
+      && [nextLink.slug, nextLink.url, nextLink.comment, nextLink.title, ...(nextLink.tags ?? [])]
         .some(value => value?.toLocaleLowerCase().includes(normalizedQuery))
     const index = links.value.findIndex(item => item.slug === link.slug)
     if (index === -1) {

@@ -10,6 +10,7 @@ export interface LinkSearchItem {
   slug: string
   url: string
   comment?: string
+  title?: string
   tags?: string[]
 }
 

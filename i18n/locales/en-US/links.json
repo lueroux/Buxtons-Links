@@ -46,6 +46,10 @@
       "active": "Active",
       "expired": "Expired",
       "tag_label": "Tag",
+      "utm_source_label": "UTM Source",
+      "all_utm_sources": "All UTM sources",
+      "utm_medium_label": "UTM Medium",
+      "all_utm_mediums": "All UTM mediums",
       "all_tags": "All tags",
       "tags_loading": "Loading tags…",
       "tags_failed": "Failed to load tags."

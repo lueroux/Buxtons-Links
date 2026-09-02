@@ -8,6 +8,9 @@ interface TagCount {
 
 const linksStore = useDashboardLinksStore()
 const allTagsValue = '__sink_all_tags__'
+const allUtmValues = '__sink_all_utm_values__'
+const utmSources = ['google', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'newsletter', 'website']
+const utmMediums = ['cpc', 'social', 'email', 'paid-social', 'affiliate', 'referral', 'display']
 const tags = shallowRef<TagCount[]>([])
 const loading = shallowRef(false)
 const error = shallowRef(false)
@@ -39,6 +42,14 @@ async function fetchTags() {
 
 function selectTag(value: unknown) {
   linksStore.tag = typeof value === 'string' && value !== allTagsValue ? value : undefined
+}
+
+function selectUtmSource(value: unknown) {
+  linksStore.utmSource = typeof value === 'string' && value !== allUtmValues ? value : undefined
+}
+
+function selectUtmMedium(value: unknown) {
+  linksStore.utmMedium = typeof value === 'string' && value !== allUtmValues ? value : undefined
 }
 
 onMounted(fetchTags)
@@ -99,6 +110,32 @@ linksStore.onLinkUpdate(() => void fetchTags())
               <span class="truncate">{{ item.name }}</span>
               <span class="text-xs text-muted-foreground tabular-nums">{{ item.count }}</span>
             </span>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      <Select :model-value="linksStore.utmSource ?? allUtmValues" @update:model-value="selectUtmSource">
+        <SelectTrigger class="min-w-44" :aria-label="$t('links.filters.utm_source_label')">
+          <SelectValue :placeholder="$t('links.filters.all_utm_sources')" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem :value="allUtmValues">
+            {{ $t('links.filters.all_utm_sources') }}
+          </SelectItem>
+          <SelectItem v-for="source in utmSources" :key="source" :value="source">
+            {{ source }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      <Select :model-value="linksStore.utmMedium ?? allUtmValues" @update:model-value="selectUtmMedium">
+        <SelectTrigger class="min-w-44" :aria-label="$t('links.filters.utm_medium_label')">
+          <SelectValue :placeholder="$t('links.filters.all_utm_mediums')" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem :value="allUtmValues">
+            {{ $t('links.filters.all_utm_mediums') }}
+          </SelectItem>
+          <SelectItem v-for="medium in utmMediums" :key="medium" :value="medium">
+            {{ medium }}
           </SelectItem>
         </SelectContent>
       </Select>

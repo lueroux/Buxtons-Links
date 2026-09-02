@@ -217,8 +217,7 @@ function clearUtmValues() {
                   :key="option.value"
                   :value="option.value"
                 >
-                  <span class="block">{{ option.label }}</span>
-                  <span class="block text-xs text-muted-foreground">{{ option.value }}</span>
+                  {{ option.label }}
                 </SelectItem>
                 <SelectSeparator />
                 <SelectItem :value="sourceOtherValue">
@@ -266,8 +265,7 @@ function clearUtmValues() {
                   :key="option.value"
                   :value="option.value"
                 >
-                  <span class="block">{{ option.label }}</span>
-                  <span class="block text-xs text-muted-foreground">{{ option.value }}</span>
+                  {{ option.label }}
                 </SelectItem>
               </SelectContent>
             </Select>

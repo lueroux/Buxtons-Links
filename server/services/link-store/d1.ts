@@ -23,6 +23,8 @@ export interface ListLinksOptions {
   cursor?: string
   sort?: LinkSortBy
   tag?: string
+  utmSource?: string
+  utmMedium?: string
   status?: LinkStatus
 }
 
@@ -36,6 +38,8 @@ export interface LinkFilterOptions {
   q?: string
   url?: string
   tag?: string
+  utmSource?: string
+  utmMedium?: string
   status?: LinkStatus
 }
 
@@ -48,6 +52,8 @@ interface D1Cursor {
   slug: string
   createdAt?: number
   tag?: string
+  utmSource?: string
+  utmMedium?: string
   status: LinkStatus
 }
 
@@ -79,6 +85,21 @@ function exactTagCondition(db: ReturnType<typeof getDatabase>, tag: string | und
         eq(linkTags.tagName, tag),
       )))
     : undefined
+}
+
+function exactUtmCondition(name: 'utm_source' | 'utm_medium', value: string | undefined) {
+  if (!value)
+    return undefined
+
+  const prefix = `${name}=${value}`
+  return or(
+    sql`lower(${links.url}) like ${`%?${prefix}&%`}`,
+    sql`lower(${links.url}) like ${`%&${prefix}&%`}`,
+    sql`lower(${links.url}) like ${`%?${prefix}`}`,
+    sql`lower(${links.url}) like ${`%&${prefix}`}`,
+    sql`lower(${links.url}) like ${`%?${prefix}#%`}`,
+    sql`lower(${links.url}) like ${`%&${prefix}#%`}`,
+  )
 }
 
 function rowToLink(row: LinkRow): Link {
@@ -307,14 +328,14 @@ function encodeCursor(cursor: D1Cursor): string {
   return `${D1_CURSOR_PREFIX}${btoa(JSON.stringify(cursor))}`
 }
 
-function decodeCursor(cursor: string | undefined, sort: LinkSortBy, tag: string | undefined, status: LinkStatus): D1Cursor | undefined {
+function decodeCursor(cursor: string | undefined, sort: LinkSortBy, options: ListLinksOptions, status: LinkStatus): D1Cursor | undefined {
   if (!cursor)
     return undefined
   if (!cursor.startsWith(D1_CURSOR_PREFIX))
     throw createError({ status: 400, statusText: 'Invalid pagination cursor' })
   try {
     const decoded = JSON.parse(atob(cursor.slice(D1_CURSOR_PREFIX.length))) as D1Cursor
-    if (decoded.sort !== sort || decoded.tag !== tag || decoded.status !== status || typeof decoded.slug !== 'string')
+    if (decoded.sort !== sort || decoded.tag !== options.tag || decoded.utmSource !== options.utmSource || decoded.utmMedium !== options.utmMedium || decoded.status !== status || typeof decoded.slug !== 'string')
       throw new Error('Cursor does not match sort')
     if ((sort === 'newest' || sort === 'oldest') && typeof decoded.createdAt !== 'number')
       throw new Error('Cursor is missing creation time')
@@ -329,7 +350,7 @@ export async function d1ListLinks(event: H3Event, options: ListLinksOptions): Pr
   const db = getDatabase(event)
   const sort = options.sort ?? 'newest'
   const status = options.status ?? 'active'
-  const cursor = decodeCursor(options.cursor, sort, options.tag, status)
+  const cursor = decodeCursor(options.cursor, sort, options, status)
   let cursorCondition
   let order
 
@@ -351,14 +372,20 @@ export async function d1ListLinks(event: H3Event, options: ListLinksOptions): Pr
   }
 
   const tagCondition = exactTagCondition(db, options.tag)
-  const rows = await db.select().from(links).where(and(statusCondition(status), tagCondition, cursorCondition)).orderBy(...order).limit(options.limit + 1)
+  const rows = await db.select().from(links).where(and(
+    statusCondition(status),
+    tagCondition,
+    exactUtmCondition('utm_source', options.utmSource),
+    exactUtmCondition('utm_medium', options.utmMedium),
+    cursorCondition,
+  )).orderBy(...order).limit(options.limit + 1)
   const hasMore = rows.length > options.limit
   const page = hasMore ? rows.slice(0, options.limit) : rows
   const last = page.at(-1)
   return {
     links: await rowsToLinks(event, page),
     list_complete: !hasMore,
-    cursor: hasMore && last ? encodeCursor({ sort, slug: last.slug, createdAt: last.createdAt, tag: options.tag, status }) : undefined,
+    cursor: hasMore && last ? encodeCursor({ sort, slug: last.slug, createdAt: last.createdAt, tag: options.tag, utmSource: options.utmSource, utmMedium: options.utmMedium, status }) : undefined,
   }
 }
 
@@ -399,12 +426,17 @@ function linkFilterCondition(db: ReturnType<typeof getDatabase>, options: LinkFi
     conditions.push(exactTagCondition(db, options.tag))
   if (options.url)
     conditions.push(eq(links.normalizedUrl, withoutQuery(options.url)))
+  if (options.utmSource)
+    conditions.push(exactUtmCondition('utm_source', options.utmSource))
+  if (options.utmMedium)
+    conditions.push(exactUtmCondition('utm_medium', options.utmMedium))
   if (options.q) {
     const pattern = `%${options.q.toLowerCase().replace(/[!%_]/g, '!$&')}%`
     conditions.push(or(
       sql`lower(${links.slug}) like ${pattern} escape '!'`,
       sql`lower(${links.url}) like ${pattern} escape '!'`,
       sql`lower(coalesce(${links.comment}, '')) like ${pattern} escape '!'`,
+      sql`lower(coalesce(${links.title}, '')) like ${pattern} escape '!'`,
       sql`exists (select 1 from ${linkTags} where ${linkTags.linkSlug} = ${links.slug} and lower(${linkTags.tagName}) like ${pattern} escape '!')`,
     )!)
   }
@@ -414,11 +446,11 @@ function linkFilterCondition(db: ReturnType<typeof getDatabase>, options: LinkFi
 
 export async function d1SearchLinks(event: H3Event, options: SearchLinksOptions): Promise<LinkSearchItem[]> {
   const db = getDatabase(event)
-  let query = db.select({ slug: links.slug, url: links.normalizedUrl, comment: links.comment }).from(links).where(linkFilterCondition(db, options)).orderBy(asc(links.slug)).$dynamic()
+  let query = db.select({ slug: links.slug, url: links.normalizedUrl, comment: links.comment, title: links.title }).from(links).where(linkFilterCondition(db, options)).orderBy(asc(links.slug)).$dynamic()
   if (options.limit)
     query = query.limit(options.limit)
   const rows = await query
-  const result = rows.map(row => ({ slug: row.slug, url: row.url, tags: [] as string[], ...(row.comment === null ? {} : { comment: row.comment }) }))
+  const result = rows.map(row => ({ slug: row.slug, url: row.url, tags: [] as string[], ...(row.comment === null ? {} : { comment: row.comment }), ...(row.title === null ? {} : { title: row.title }) }))
   return await addTagsToLinksFromDatabase(db, result, result.map(link => link.slug))
 }
 
